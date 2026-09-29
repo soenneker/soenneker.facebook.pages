@@ -94,7 +94,7 @@ public sealed class FacebookPagesUtil : IFacebookPagesUtil
             {
                 Url = urls[i], Published = false
             }, cancellationToken: cancellationToken).ConfigureAwait(false);
-            AddText(body, $"attached_media[{i}]", JsonSerializer.Serialize(new { media_fbid = RequireId(photo?.Id) }));
+            AddText(body, $"attached_media[{i}]", new System.Text.Json.Nodes.JsonObject { ["media_fbid"] = RequireId(photo?.Id) }.ToJsonString());
         }
         var response = await client[pageId].Feed.PostAsync(body, cancellationToken: cancellationToken).ConfigureAwait(false);
         return RequireId(response?.Id);
