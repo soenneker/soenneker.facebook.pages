@@ -46,6 +46,6 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
         <PackageReference Include="Soenneker.Facebook.OpenApiClient" Version="4.0.9" />
-        <PackageReference Include="Soenneker.Facebook.OpenApiClientUtil" Version="4.0.12" />
+        <PackageReference Include="Soenneker.Facebook.OpenApiClientUtil" Version="4.0.13" />
     </ItemGroup>
 </Project>
