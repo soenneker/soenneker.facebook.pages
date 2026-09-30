@@ -14,7 +14,7 @@ namespace Soenneker.Facebook.Pages.Tests;
 public sealed class PublishingTests
 {
     [Test]
-    public async Task Photo_contains_url_caption_and_published_flag()
+    public async ValueTask Photo_contains_url_caption_and_published_flag()
     {
         using var fixture = new Fixture("""{"id":"photo1","post_id":"page_post"}""");
         var result = await fixture.Util.PublishPhoto("page", "https://example.com/image.jpg", "Caption & more");
@@ -27,7 +27,7 @@ public sealed class PublishingTests
     }
 
     [Test]
-    public async Task Multiple_photos_are_uploaded_before_one_feed_post()
+    public async ValueTask Multiple_photos_are_uploaded_before_one_feed_post()
     {
         using var fixture = new Fixture("""{"id":"photo1"}""", """{"id":"photo2"}""", """{"id":"page_post"}""");
         string id = await fixture.Util.PublishPhotos("page", ["https://example.com/1.jpg", "https://example.com/2.jpg"], "Photos");
@@ -41,7 +41,7 @@ public sealed class PublishingTests
     }
 
     [Test]
-    public async Task Missing_photo_id_stops_before_publishing()
+    public async ValueTask Missing_photo_id_stops_before_publishing()
     {
         using var fixture = new Fixture("{}");
         try
@@ -56,7 +56,7 @@ public sealed class PublishingTests
     }
 
     [Test]
-    public async Task Invalid_image_batch_makes_no_requests()
+    public async ValueTask Invalid_image_batch_makes_no_requests()
     {
         using var fixture = new Fixture();
         try
@@ -71,7 +71,7 @@ public sealed class PublishingTests
     }
 
     [Test]
-    public async Task Text_and_link_are_sent_as_multipart_fields()
+    public async ValueTask Text_and_link_are_sent_as_multipart_fields()
     {
         using var fixture = new Fixture("""{"id":"post"}""");
         Check(await fixture.Util.PublishPost("page", "Hello", "https://example.com") == "post", "Incorrect post ID.");
@@ -80,7 +80,7 @@ public sealed class PublishingTests
     }
 
     [Test]
-    public async Task Video_stream_contains_file_and_remains_open()
+    public async ValueTask Video_stream_contains_file_and_remains_open()
     {
         using var fixture = new Fixture("""{"id":"video"}""");
         using var stream = new MemoryStream("video-content"u8.ToArray());
@@ -92,7 +92,7 @@ public sealed class PublishingTests
     }
 
     [Test]
-    public async Task Cancellation_is_forwarded()
+    public async ValueTask Cancellation_is_forwarded()
     {
         using var fixture = new Fixture();
         using var cts = new CancellationTokenSource();
