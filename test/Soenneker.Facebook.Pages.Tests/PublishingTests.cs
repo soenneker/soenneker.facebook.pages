@@ -14,10 +14,10 @@ namespace Soenneker.Facebook.Pages.Tests;
 public sealed class PublishingTests
 {
     [Test]
-    public async ValueTask Photo_contains_url_caption_and_published_flag()
+    public async ValueTask Photo_contains_url_caption_and_published_flag(CancellationToken cancellationToken)
     {
         using var fixture = new Fixture("""{"id":"photo1","post_id":"page_post"}""");
-        var result = await fixture.Util.PublishPhoto("page", "https://example.com/image.jpg", "Caption & more");
+        var result = await fixture.Util.PublishPhoto("page", "https://example.com/image.jpg", "Caption & more", cancellationToken: cancellationToken);
         Check(result.PostId == "page_post", "Post ID was not deserialized.");
         Check(fixture.Handler.Requests[0].Path == "/v26.0/page/photos", "Incorrect photo endpoint.");
         string body = Uri.UnescapeDataString(fixture.Handler.Requests[0].Body.Replace("+", " "));
@@ -27,10 +27,10 @@ public sealed class PublishingTests
     }
 
     [Test]
-    public async ValueTask Multiple_photos_are_uploaded_before_one_feed_post()
+    public async ValueTask Multiple_photos_are_uploaded_before_one_feed_post(CancellationToken cancellationToken)
     {
         using var fixture = new Fixture("""{"id":"photo1"}""", """{"id":"photo2"}""", """{"id":"page_post"}""");
-        string id = await fixture.Util.PublishPhotos("page", ["https://example.com/1.jpg", "https://example.com/2.jpg"], "Photos");
+        string id = await fixture.Util.PublishPhotos("page", ["https://example.com/1.jpg", "https://example.com/2.jpg"], "Photos", cancellationToken: cancellationToken);
         Check(id == "page_post", "Incorrect post ID.");
         var requests = fixture.Handler.Requests;
         Check(requests.Count == 3, "Expected two uploads and one post.");
@@ -41,12 +41,12 @@ public sealed class PublishingTests
     }
 
     [Test]
-    public async ValueTask Missing_photo_id_stops_before_publishing()
+    public async ValueTask Missing_photo_id_stops_before_publishing(CancellationToken cancellationToken)
     {
         using var fixture = new Fixture("{}");
         try
         {
-            await fixture.Util.PublishPhotos("page", ["https://example.com/1.jpg"]);
+            await fixture.Util.PublishPhotos("page", ["https://example.com/1.jpg"], cancellationToken: cancellationToken);
             throw new Exception("Expected a missing-ID failure.");
         }
         catch (InvalidOperationException)
@@ -56,12 +56,12 @@ public sealed class PublishingTests
     }
 
     [Test]
-    public async ValueTask Invalid_image_batch_makes_no_requests()
+    public async ValueTask Invalid_image_batch_makes_no_requests(CancellationToken cancellationToken)
     {
         using var fixture = new Fixture();
         try
         {
-            await fixture.Util.PublishPhotos("page", ["https://example.com/1.jpg", "file:///invalid.jpg"]);
+            await fixture.Util.PublishPhotos("page", ["https://example.com/1.jpg", "file:///invalid.jpg"], cancellationToken: cancellationToken);
             throw new Exception("Expected URL validation to fail.");
         }
         catch (ArgumentException)
@@ -71,20 +71,20 @@ public sealed class PublishingTests
     }
 
     [Test]
-    public async ValueTask Text_and_link_are_sent_as_multipart_fields()
+    public async ValueTask Text_and_link_are_sent_as_multipart_fields(CancellationToken cancellationToken)
     {
         using var fixture = new Fixture("""{"id":"post"}""");
-        Check(await fixture.Util.PublishPost("page", "Hello", "https://example.com") == "post", "Incorrect post ID.");
+        Check(await fixture.Util.PublishPost("page", "Hello", "https://example.com", cancellationToken: cancellationToken) == "post", "Incorrect post ID.");
         string body = fixture.Handler.Requests[0].Body;
         Check(body.Contains("Hello") && body.Contains("https://example.com"), "Missing post fields.");
     }
 
     [Test]
-    public async ValueTask Video_stream_contains_file_and_remains_open()
+    public async ValueTask Video_stream_contains_file_and_remains_open(CancellationToken cancellationToken)
     {
         using var fixture = new Fixture("""{"id":"video"}""");
         using var stream = new MemoryStream("video-content"u8.ToArray());
-        Check(await fixture.Util.PublishVideo("page", stream, "clip.mp4", description: "Clip") == "video", "Incorrect video ID.");
+        Check(await fixture.Util.PublishVideo("page", stream, "clip.mp4", description: "Clip", cancellationToken: cancellationToken) == "video", "Incorrect video ID.");
         Check(stream.CanRead, "The caller-owned stream was closed.");
         var request = fixture.Handler.Requests[0];
         Check(request.Path == "/v26.0/page/videos", "Incorrect video endpoint.");
@@ -92,7 +92,7 @@ public sealed class PublishingTests
     }
 
     [Test]
-    public async ValueTask Cancellation_is_forwarded()
+    public async ValueTask Cancellation_is_forwarded(CancellationToken cancellationToken)
     {
         using var fixture = new Fixture();
         using var cts = new CancellationTokenSource();
