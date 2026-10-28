@@ -47,6 +47,6 @@
 
     <ItemGroup>
         <PackageReference Include="Soenneker.Facebook.OpenApiClient" Version="11.0.46" />
-        <PackageReference Include="Soenneker.Facebook.OpenApiClientUtil" Version="11.0.67" />
+        <PackageReference Include="Soenneker.Facebook.OpenApiClientUtil" Version="11.0.68" />
     </ItemGroup>
 </Project>
